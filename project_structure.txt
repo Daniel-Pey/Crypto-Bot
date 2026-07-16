@@ -1,0 +1,31 @@
+crypto_bot/
+├── .env                    # Переменные окружения
+├── .gitignore             # Игнорируемые файлы
+├── requirements.txt       # Зависимости
+├── main.py               # Точка входа, запуск бота
+├── bot.py                # Только переменная bot
+├── config.py             # Конфигурация из .env
+├── database.py           # Инициализация БД (SQLAlchemy)
+├── models.py             # Модели данных
+├── handlers/
+│   ├── __init__.py
+│   ├── start.py          # Команда /start
+│   ├── menu.py           # Главное меню
+│   ├── coins.py          # Работа с криптовалютами
+│   ├── subscription.py   # Управление подпиской
+│   └── alerts.py         # Управление алертами
+├── services/
+│   ├── __init__.py
+│   ├── crypto_api.py     # Взаимодействие с API криптобирж
+│   ├── price_checker.py  # Фоновый мониторинг цен
+│   └── payment.py        # Обработка платежей
+├── utils/
+│   ├── __init__.py
+│   ├── logger.py         # Настройка логирования
+│   └── validators.py     # Валидаторы данных
+├── keyboards/
+│   ├── __init__.py
+│   ├── main.py           # Основные клавиатуры
+│   └── inline.py         # Inline-клавиатуры
+└── migrations/           # Миграции БД (опционально)
+    └── __init__.py
