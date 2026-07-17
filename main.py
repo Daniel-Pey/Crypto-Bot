@@ -35,6 +35,24 @@ BOT_ASCII_ART = """
 # 🔄 Глобальные переменные для сервисов
 price_checker = None
 
+
+def stop_working_handler(sig, frame):
+    """
+    🔄 Обработчик сигналов для корректного завершения бота
+    """
+    logger.info("🛑 Получен сигнал завершения...")
+    
+    global price_checker
+    if price_checker:
+        logger.info("🔄 Остановка PriceChecker...")
+        price_checker.stop()
+    
+    logger.info("🧹 Закрываю соединение с базой данных...")
+    logger.info("👋 Бот успешно остановлен.")
+    admin.admin_log(f"🛑 Бот остановлен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\nПричина: Штатное прекращение работы")
+    sys.exit(0)
+
+
 def signal_handler(sig, frame):
     """
     🔄 Обработчик сигналов для корректного завершения бота
@@ -48,8 +66,8 @@ def signal_handler(sig, frame):
     
     logger.info("🧹 Закрываю соединение с базой данных...")
     logger.info("👋 Бот успешно остановлен.")
-    admin.admin_log(f"🛑 Бот остановлен {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\nПричина: {sig} {frame}")
-    sys.exit(0)
+    admin.admin_log(f"🛑 Бот остановлен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\nПричина: Ошибка на сервере {sig} {frame}")
+    sys.exit(1)
 
 if __name__ == '__main__':
     # 📝 Выводим красивый ASCII-арт при запуске
@@ -57,7 +75,7 @@ if __name__ == '__main__':
     print(BOT_ASCII_ART.format(timestamp=current_time))
     
     # 🎯 Регистрируем обработчики сигналов
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, stop_working_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
     # 🗄️ Инициализируем базу данных
@@ -92,10 +110,10 @@ if __name__ == '__main__':
         admin.admin_log(f'✅ Бот запущен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     except KeyboardInterrupt:
         logger.info("🛑 Получен сигнал прекращения работы")
-        admin.admin_log("🛑 Бот остановлен\nПричина: Штатное завершение работы")
+        stop_working_handler(0, None)
     except Exception as e:
         logger.error(f"💥 Критическая ошибка при работе бота: {e}")
-        admin.admin_log(f"🛑 Бот остановлен\nПричина: 💥 Ошибка на сервере\nВывод:\n{e}")
+        signal_handler(1, e)
     finally:
         # 🧹 Закрываем все соединения
         logger.info("🧹 Закрываю соединение с базой данных...")
