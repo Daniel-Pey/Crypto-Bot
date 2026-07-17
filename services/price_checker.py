@@ -4,10 +4,10 @@
 
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from utils.logger import logger
-from database import create_session
+from database import get_db
 from models import User, Coin, UserCoin, Alert
 from services.crypto_api import CryptoPriceService
 
@@ -70,7 +70,7 @@ class PriceChecker:
     
     def _check_prices(self):
         """📊 Проверка всех цен в базе данных"""
-        db = create_session()
+        db = get_db()
         
         try:
             # 🔍 Получаем все монеты, которые отслеживаются
@@ -123,10 +123,9 @@ class PriceChecker:
             if not user or not coin or not coin.current_price:
                 return
             
-            # 🔍 Получаем активные алерты для этой монеты
+            # 🔍 Получаем алерты для этой монеты (включая сработавшие)
             alerts = db.query(Alert).filter_by(
-                user_coin_id=user_coin.id,
-                is_triggered=False
+                user_coin_id=user_coin.id
             ).all()
             
             for alert in alerts:
@@ -138,42 +137,120 @@ class PriceChecker:
     def _check_alert(self, db, alert, user, coin):
         """✅ Проверка конкретного алерта"""
         current_price = coin.current_price
+        symbol = coin.symbol
+        
+        # 📊 Проверяем, нужно ли сбросить алерт (если прошло много времени)
+        self._reset_stale_alerts(db, alert)
         
         if alert.alert_type == "price_reached":
             # 💰 Проверка по достижению цены
             trigger_value = alert.trigger_value
             
-            if current_price >= trigger_value:
+            # 🔥 НОВОЕ: Проверяем, достигла ли цена целевого значения
+            # Учитываем направление: если цена поднялась выше или упала ниже
+            price_reached = False
+            
+            # 🎯 Если алерт еще не сработал
+            if not alert.is_triggered:
+                if current_price >= trigger_value:
+                    price_reached = True
+            # 🔄 Если алерт уже сработал, но мы хотим, чтобы он срабатывал снова
+            # при каждом пересечении уровня
+            else:
+                # 📈 Проверяем, не упала ли цена ниже уровня (для повторного срабатывания)
+                # Или не поднялась ли выше (для алертов на падение)
+                if current_price < trigger_value:
+                    # 🔄 Сбрасываем алерт, чтобы он мог сработать снова
+                    alert.is_triggered = False
+                    alert.triggered_at = None
+                    db.commit()
+                    logger.info(f"🔄 Алерт для {symbol} сброшен (цена упала ниже {trigger_value})")
+                    return
+                else:
+                    # ✅ Цена все еще выше уровня, алерт уже сработал
+                    return
+            
+            if price_reached:
+                # 📤 Отправляем уведомление
                 self._send_alert(
                     user.telegram_id,
-                    coin.symbol,
-                    f"💰 Цена {coin.symbol} достигла ${current_price:,.2f}! 🎯 Цель: ${trigger_value:,.2f}"
+                    symbol,
+                    f"💰 Цена {symbol} достигла ${current_price:,.2f}! 🎯 Цель: ${trigger_value:,.2f}",
+                    alert
                 )
+                
+                # ✅ Помечаем алерт как сработавший
                 alert.is_triggered = True
                 alert.triggered_at = datetime.utcnow()
                 db.commit()
-                logger.info(f"🔔 Отправлен ценовой алерт для {user.telegram_id} ({coin.symbol})")
+                logger.info(f"🔔 Отправлен ценовой алерт для {user.telegram_id} ({symbol})")
                 
         elif alert.alert_type == "price_change":
             # 📊 Проверка по изменению процента
             threshold = alert.trigger_value
             change = coin.price_change_24h
             
-            if change is not None and abs(change) >= threshold:
+            if change is None:
+                return
+            
+            # 🔥 НОВОЕ: Проверяем, нужно ли сбросить процентный алерт
+            if alert.is_triggered:
+                # 🔄 Если алерт уже сработал, проверяем, не вернулось ли изменение в норму
+                if abs(change) < threshold * 0.5:  # 🎯 Возврат на 50% от порога
+                    alert.is_triggered = False
+                    alert.triggered_at = None
+                    db.commit()
+                    logger.info(f"🔄 Процентный алерт для {symbol} сброшен (изменение вернулось в норму)")
+                return
+            
+            # ✅ Проверяем, превысило ли изменение порог
+            if abs(change) >= threshold:
                 direction = "📈 выросла" if change > 0 else "📉 упала"
                 self._send_alert(
                     user.telegram_id,
-                    coin.symbol,
-                    f"📊 Цена {coin.symbol} {direction} на {abs(change):.2f}%! ⚡ Текущая: ${current_price:,.2f}"
+                    symbol,
+                    f"📊 Цена {symbol} {direction} на {abs(change):.2f}%! ⚡ Текущая: ${current_price:,.2f}",
+                    alert
                 )
+                
+                # ✅ Помечаем алерт как сработавший
                 alert.is_triggered = True
                 alert.triggered_at = datetime.utcnow()
                 db.commit()
-                logger.info(f"🔔 Отправлен процентный алерт для {user.telegram_id} ({coin.symbol})")
+                logger.info(f"🔔 Отправлен процентный алерт для {user.telegram_id} ({symbol})")
     
-    def _send_alert(self, telegram_id: int, symbol: str, message: str):
-        """📤 Отправка уведомления пользователю"""
+    def _reset_stale_alerts(self, db, alert):
+        """
+        🔄 Сброс "зависших" алертов (если прошло много времени)
+        
+        Args:
+            db: Сессия БД
+            alert: Объект Alert
+        """
+        if not alert.is_triggered:
+            return
+        
+        # ⏰ Если алерт сработал более 24 часов назад, сбрасываем его
+        if alert.triggered_at:
+            time_since_trigger = datetime.utcnow() - alert.triggered_at
+            if time_since_trigger > timedelta(hours=24):
+                alert.is_triggered = False
+                alert.triggered_at = None
+                db.commit()
+                logger.info(f"🔄 Алерт для {alert.user_coin.coin.symbol} сброшен (прошло >24ч)")
+    
+    def _send_alert(self, telegram_id: int, symbol: str, message: str, alert: Alert = None):
+        """
+        📤 Отправка уведомления пользователю
+        
+        Args:
+            telegram_id: ID пользователя в Telegram
+            symbol: Символ монеты
+            message: Текст сообщения
+            alert: Объект Alert (для дополнительной информации)
+        """
         try:
+            # 📝 Формируем сообщение
             full_message = f"""
 🔔 <b>Уведомление по {symbol}</b>
 
@@ -182,12 +259,20 @@ class PriceChecker:
 📅 {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}
 
 💡 Для управления алертами используйте меню бота
-            """
+"""
+            
+            # 📤 Если есть алерт, добавляем кнопку для управления
+            if alert:
+                from keyboards.inline import get_alert_control_keyboard
+                reply_markup = get_alert_control_keyboard(alert.id, symbol)
+            else:
+                reply_markup = None
             
             self.bot.send_message(
                 telegram_id,
                 full_message,
-                parse_mode='HTML'
+                parse_mode='HTML',
+                reply_markup=reply_markup
             )
             
             logger.info(f"✅ Уведомление отправлено пользователю {telegram_id}")

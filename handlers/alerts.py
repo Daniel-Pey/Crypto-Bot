@@ -490,3 +490,187 @@ def process_percent_alert(message, user_id, coin_id, user_coin_id):
     finally:
         # 🧹 Закрываем сессию
         db.close()
+
+
+# ============================================================
+# 🎯 УПРАВЛЕНИЕ АЛЕРТАМИ (НОВЫЕ ФУНКЦИИ)
+# ============================================================
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("alert_disable_"))
+def alert_disable(call):
+    """
+    🔕 Отключение алерта
+    """
+    # 📝 Извлекаем ID алерта
+    alert_id = int(call.data.replace("alert_disable_", ""))
+    
+    # 📝 Логируем действие
+    logger.info(f"👤 Пользователь @{call.from_user.username} отключил алерт {alert_id}")
+    
+    # 📊 Получаем сессию БД
+    db = create_session()
+    
+    try:
+        # 🔍 Получаем алерт
+        alert = db.query(Alert).filter_by(id=alert_id).first()
+        
+        if not alert:
+            bot.answer_callback_query(call.id, "❌ Алерт не найден")
+            return
+        
+        # 🔍 Проверяем, что алерт принадлежит пользователю
+        user = db.query(User).filter_by(telegram_id=call.from_user.id).first()
+        
+        if not user or alert.user_id != user.id:
+            bot.answer_callback_query(call.id, "🚫 Это не ваш алерт")
+            return
+        
+        # 🗑️ Удаляем алерт
+        db.delete(alert)
+        db.commit()
+        
+        # ✅ Подтверждение
+        bot.edit_message_text(
+            "🔕 Алерт успешно отключен",
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=get_back_keyboard()
+        )
+        
+        bot.answer_callback_query(call.id, "🔕 Алерт отключен")
+        
+        logger.info(f"✅ Алерт {alert_id} отключен пользователем @{call.from_user.username}")
+        
+    except Exception as e:
+        logger.error(f"💥 Ошибка в alert_disable: {e}")
+        bot.answer_callback_query(call.id, "❌ Произошла ошибка")
+        db.rollback()
+    finally:
+        db.close()
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("alert_reset_"))
+def alert_reset(call):
+    """
+    🔄 Сброс алерта
+    """
+    # 📝 Извлекаем ID алерта
+    alert_id = int(call.data.replace("alert_reset_", ""))
+    
+    # 📝 Логируем действие
+    logger.info(f"👤 Пользователь @{call.from_user.username} сбросил алерт {alert_id}")
+    
+    # 📊 Получаем сессию БД
+    db = create_session()
+    
+    try:
+        # 🔍 Получаем алерт
+        alert = db.query(Alert).filter_by(id=alert_id).first()
+        
+        if not alert:
+            bot.answer_callback_query(call.id, "❌ Алерт не найден")
+            return
+        
+        # 🔍 Проверяем, что алерт принадлежит пользователю
+        user = db.query(User).filter_by(telegram_id=call.from_user.id).first()
+        
+        if not user or alert.user_id != user.id:
+            bot.answer_callback_query(call.id, "🚫 Это не ваш алерт")
+            return
+        
+        # 🔄 Сбрасываем алерт
+        alert.is_triggered = False
+        alert.triggered_at = None
+        db.commit()
+        
+        # ✅ Подтверждение
+        bot.edit_message_text(
+            "🔄 Алерт сброшен. Он будет снова активен.",
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=get_back_keyboard()
+        )
+        
+        bot.answer_callback_query(call.id, "🔄 Алерт сброшен")
+        
+        logger.info(f"✅ Алерт {alert_id} сброшен пользователем @{call.from_user.username}")
+        
+    except Exception as e:
+        logger.error(f"💥 Ошибка в alert_reset: {e}")
+        bot.answer_callback_query(call.id, "❌ Произошла ошибка")
+        db.rollback()
+    finally:
+        db.close()
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("alert_repeat_"))
+def alert_repeat(call):
+    """
+    🔄 Настройка повторяющегося алерта
+    """
+    # 📝 Извлекаем символ
+    symbol = call.data.replace("alert_repeat_", "")
+    
+    # 📝 Логируем действие
+    logger.info(f"👤 Пользователь @{call.from_user.username} настроил повторение для {symbol}")
+    
+    # 📊 Получаем сессию БД
+    db = create_session()
+    
+    try:
+        # 🔍 Получаем пользователя
+        user = db.query(User).filter_by(telegram_id=call.from_user.id).first()
+        
+        if not user:
+            bot.answer_callback_query(call.id, "❌ Пользователь не найден")
+            return
+        
+        # 🔍 Получаем монету
+        coin = db.query(Coin).filter_by(symbol=symbol).first()
+        
+        if not coin:
+            bot.answer_callback_query(call.id, "❌ Монета не найдена")
+            return
+        
+        # 🔍 Получаем связь пользователь-монета
+        user_coin = db.query(UserCoin).filter_by(
+            user_id=user.id,
+            coin_id=coin.id
+        ).first()
+        
+        if not user_coin:
+            bot.answer_callback_query(call.id, "❌ Монета не найдена в вашем списке")
+            return
+        
+        # 🔍 Проверяем, есть ли уже алерт
+        existing_alert = db.query(Alert).filter_by(
+            user_coin_id=user_coin.id,
+            is_triggered=False
+        ).first()
+        
+        if existing_alert:
+            bot.answer_callback_query(call.id, "⚠️ Алерт уже активен")
+            return
+        
+        # 📝 Создаем новый алерт (по умолчанию - по цене)
+        alert = Alert(
+            user_id=user.id,
+            user_coin_id=user_coin.id,
+            alert_type="price_reached",
+            trigger_value=coin.current_price * 1.1 if coin.current_price else 100000,  # +10%
+            created_at=datetime.utcnow()
+        )
+        db.add(alert)
+        db.commit()
+        
+        # ✅ Подтверждение
+        bot.answer_callback_query(call.id, "🔄 Алерт создан заново")
+        
+        logger.info(f"✅ Алерт создан заново для {symbol} пользователем @{call.from_user.username}")
+        
+    except Exception as e:
+        logger.error(f"💥 Ошибка в alert_repeat: {e}")
+        bot.answer_callback_query(call.id, "❌ Произошла ошибка")
+        db.rollback()
+    finally:
+        db.close()

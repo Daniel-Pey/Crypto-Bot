@@ -363,3 +363,74 @@ def get_admin_keyboard():
     )
     
     return keyboard
+
+
+# ============================================================
+# 🔔 КЛАВИАТУРЫ ДЛЯ УПРАВЛЕНИЯ АЛЕРТАМИ
+# ============================================================
+
+def get_alert_control_keyboard(alert_id: int, symbol: str):
+    """
+    🔔 Клавиатура для управления алертом после получения уведомления
+    
+    Args:
+        alert_id: ID алерта
+        symbol: Символ монеты
+        
+    Returns:
+        InlineKeyboardMarkup: Клавиатура с кнопками управления
+    """
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    
+    keyboard.add(
+        InlineKeyboardButton(
+            "🔕 Отключить алерт",
+            callback_data=f"alert_disable_{alert_id}"
+        ),
+        InlineKeyboardButton(
+            "🔄 Сбросить алерт",
+            callback_data=f"alert_reset_{alert_id}"
+        )
+    )
+    
+    keyboard.add(
+        InlineKeyboardButton(
+            "📊 Посмотреть монету",
+            callback_data=f"coin_{symbol}"
+        )
+    )
+    
+    return keyboard
+
+
+def get_alert_settings_keyboard(symbol: str):
+    """
+    ⚙️ Клавиатура настроек алерта
+    
+    Args:
+        symbol: Символ монеты
+        
+    Returns:
+        InlineKeyboardMarkup: Клавиатура с настройками
+    """
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    
+    keyboard.add(
+        InlineKeyboardButton(
+            "🔄 Повторять алерт",
+            callback_data=f"alert_repeat_{symbol}"
+        ),
+        InlineKeyboardButton(
+            "🔕 Отключить",
+            callback_data=f"alert_disable_{symbol}"
+        )
+    )
+    
+    keyboard.add(
+        InlineKeyboardButton(
+            "🔙 Назад к монете",
+            callback_data=f"coin_{symbol}"
+        )
+    )
+    
+    return keyboard
