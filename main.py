@@ -104,6 +104,11 @@ if __name__ == '__main__':
     logger.info("🚀 Запуск бота...")
     
     # 🔄 Запускаем бесконечный поллинг
-    bot.polling(non_stop=True, timeout=10, long_polling_timeout=5, skip_pending=True)
     logger.info("✅ Бот готов к работе . . .")
     admin.admin_log(f'✅ Бот запущен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    try:
+        bot.polling(non_stop=True, timeout=10, long_polling_timeout=5, skip_pending=True)
+    except Exception as e:
+        logger.error(f"🛑 Не получилось запустить бота: {e}")
+        admin.admin_log(f"🛑 Не получилось запустить бота в {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}: {e}")
+        sys.exit(1)
