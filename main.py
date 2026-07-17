@@ -103,21 +103,7 @@ if __name__ == '__main__':
     # 🚀 Запускаем бота
     logger.info("🚀 Запуск бота...")
     
-    try:
-        # 🔄 Запускаем бесконечный поллинг
-        bot.polling(non_stop=True, timeout=10, long_polling_timeout=5, skip_pending=True)
-        logger.info("✅ Бот готов к работе . . .")
-        admin.admin_log(f'✅ Бот запущен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
-    except KeyboardInterrupt:
-        logger.info("🛑 Получен сигнал прекращения работы")
-        stop_working_handler(0, None)
-    except Exception as e:
-        logger.error(f"💥 Критическая ошибка при работе бота: {e}")
-        signal_handler(1, e)
-    finally:
-        # 🧹 Закрываем все соединения
-        logger.info("🧹 Закрываю соединение с базой данных...")
-        if price_checker:
-            price_checker.stop()
-        logger.info("👋 Бот остановлен")
-        sys.exit(1)
+    # 🔄 Запускаем бесконечный поллинг
+    bot.polling(non_stop=True, timeout=10, long_polling_timeout=5, skip_pending=True)
+    logger.info("✅ Бот готов к работе . . .")
+    admin.admin_log(f'✅ Бот запущен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
