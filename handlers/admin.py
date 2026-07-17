@@ -386,5 +386,12 @@ def admin_info(call):
 
 👑 <b>Администраторы:</b>
 """
+    bot.edit_message_text(
+        text,
+        call.message.chat.id,
+        call.message.message_id,
+        parse_mode='HTML',
+        reply_markup=get_admin_back_keyboard()
+    )
     
     bot.answer_callback_query(call.id, "ℹ️ Информация")

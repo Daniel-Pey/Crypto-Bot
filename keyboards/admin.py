@@ -24,12 +24,7 @@ def get_admin_keyboard():
     
     keyboard.add(
         InlineKeyboardButton("📨 Рассылка", callback_data="admin_broadcast"),
-        InlineKeyboardButton("📝 Логи", callback_data="admin_logs")
-    )
-    
-    keyboard.add(
-        InlineKeyboardButton("ℹ️ Информация", callback_data="admin_info"),
-        InlineKeyboardButton("🔄 Обновить", callback_data="admin_refresh")
+        InlineKeyboardButton("ℹ️ Информация", callback_data="admin_info")
     )
     
     return keyboard
