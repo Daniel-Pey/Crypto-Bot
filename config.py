@@ -10,6 +10,7 @@ class Config:
     ADMINS_ID = list(map(int, str(os.getenv('ADMIN_ID')).split(', ')))
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     CARD_NUMBER = os.getenv('CARD_NUMBER')
+    SUPPORT_USERNAME = os.getenv("SUPPORT_USERNAME")
     
     # Цены на подписки
     SUBSCRIPTION_PRICES = {
