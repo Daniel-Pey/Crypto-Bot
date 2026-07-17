@@ -8,3 +8,4 @@ from . import menu
 from . import coins
 from . import subscription
 from . import alerts
+from . import admin
