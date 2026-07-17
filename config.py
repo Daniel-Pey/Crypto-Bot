@@ -11,6 +11,7 @@ class Config:
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     CARD_NUMBER = os.getenv('CARD_NUMBER')
     SUPPORT_USERNAME = os.getenv("SUPPORT_USERNAME")
+    VERSION = os.getenv("VERSION")
     
     # Цены на подписки
     SUBSCRIPTION_PRICES = {

@@ -2,7 +2,7 @@
 🎨 Пакет клавиатур для бота
 """
 
-# 📦 Inline-клавиатуры (для callback-запросов)
+# Inline-клавиатуры
 from .inline import (
     get_start_keyboard,
     get_main_menu_keyboard,
@@ -14,11 +14,10 @@ from .inline import (
     get_back_keyboard,
     get_cancel_keyboard,
     get_confirm_keyboard,
-    get_settings_keyboard,
-    get_admin_keyboard
+    get_settings_keyboard
 )
 
-# ⌨️ Reply-клавиатуры (для быстрого ввода)
+# Reply-клавиатуры
 from .main import (
     get_main_keyboard,
     get_simple_main_keyboard,
@@ -29,17 +28,21 @@ from .main import (
     get_coin_symbol_keyboard,
     get_number_keyboard,
     remove_keyboard,
-    get_admin_keyboard as get_admin_reply_keyboard,
-    get_language_keyboard,
-    get_feedback_keyboard
+    get_admin_keyboard as get_admin_reply_keyboard
 )
 
-# ⌨️ Reply-клавиатуры (альтернативный файл)
-from .reply import (
-    get_main_reply_keyboard,
-    get_cancel_reply_keyboard as get_cancel_reply_alt,
-    get_confirm_reply_keyboard,
-    get_remove_keyboard
+# Административные клавиатуры
+from .admin import (
+    get_admin_keyboard,                    # 🔥 ОСНОВНАЯ АДМИН-КЛАВИАТУРА
+    get_admin_menu_keyboard,
+    get_admin_back_keyboard,
+    get_admin_cancel_keyboard,
+    get_admin_confirm_broadcast_keyboard,
+    get_admin_logs_keyboard,
+    get_admin_users_keyboard,
+    get_admin_stats_keyboard,
+    get_admin_broadcast_keyboard,
+    get_admin_info_keyboard
 )
 
 __all__ = [
@@ -55,9 +58,8 @@ __all__ = [
     'get_cancel_keyboard',
     'get_confirm_keyboard',
     'get_settings_keyboard',
-    'get_admin_keyboard',
     
-    # Reply-клавиатуры из main.py
+    # Reply-клавиатуры
     'get_main_keyboard',
     'get_simple_main_keyboard',
     'get_cancel_reply_keyboard',
@@ -68,12 +70,16 @@ __all__ = [
     'get_number_keyboard',
     'remove_keyboard',
     'get_admin_reply_keyboard',
-    'get_language_keyboard',
-    'get_feedback_keyboard',
     
-    # Reply-клавиатуры из reply.py
-    'get_main_reply_keyboard',
-    'get_cancel_reply_alt',
-    'get_confirm_reply_keyboard',
-    'get_remove_keyboard'
+    # Админ-клавиатуры
+    'get_admin_keyboard',
+    'get_admin_menu_keyboard',
+    'get_admin_back_keyboard',
+    'get_admin_cancel_keyboard',
+    'get_admin_confirm_broadcast_keyboard',
+    'get_admin_logs_keyboard',
+    'get_admin_users_keyboard',
+    'get_admin_stats_keyboard',
+    'get_admin_broadcast_keyboard',
+    'get_admin_info_keyboard'
 ]
