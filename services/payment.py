@@ -11,7 +11,7 @@
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Tuple
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User
 from config import config
 
@@ -90,7 +90,7 @@ class PaymentService:
             return False, "❌ Неверный формат платежа", None
         
         # 📊 Получаем сессию БД
-        db = get_db()
+        db = create_session()
         
         try:
             # 🔍 Находим пользователя
@@ -130,7 +130,7 @@ class PaymentService:
         Returns:
             Dict: Информация о подписке
         """
-        db = get_db()
+        db = create_session()
         
         try:
             user = db.query(User).filter_by(telegram_id=user_id).first()

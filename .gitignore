@@ -10,3 +10,4 @@ system/
 .vscode/
 .env
 test.py
+*.log

@@ -5,7 +5,7 @@
 
 from bot import bot
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User
 from datetime import datetime, timedelta
 from config import config
@@ -25,7 +25,7 @@ def subscription_menu(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} открыл меню подписки")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -105,7 +105,7 @@ def subscribe(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} выбрал тариф {coins} монет")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -215,7 +215,7 @@ def confirm_payment(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} подтвердил оплату {price}₽ за {coins} монет")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя

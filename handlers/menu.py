@@ -4,7 +4,7 @@
 
 from bot import bot
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User
 from keyboards.inline import get_start_keyboard, get_main_menu_keyboard, get_back_keyboard
 from handlers.start import start_command
@@ -22,7 +22,7 @@ def menu_command(message):
     logger.info(f"👤 Пользователь @{message.from_user.username} вызвал /menu")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -99,7 +99,7 @@ def back_to_menu(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} вернулся в меню")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя

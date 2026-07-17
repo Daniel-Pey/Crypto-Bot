@@ -8,6 +8,7 @@ from .validators import (
     validate_price,
     validate_percent
 )
+from .admin import admin
 
 __all__ = [
     'logger',
@@ -15,5 +16,6 @@ __all__ = [
     'log_error',
     'validate_crypto_symbol',
     'validate_price',
-    'validate_percent'
+    'validate_percent',
+    'admin'
 ]

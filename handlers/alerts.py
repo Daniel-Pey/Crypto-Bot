@@ -5,7 +5,7 @@
 
 from bot import bot
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User, Coin, UserCoin, Alert
 from utils.validators import validate_price, validate_percent
 from keyboards.inline import get_back_keyboard, get_cancel_keyboard, get_alert_keyboard
@@ -22,7 +22,7 @@ def my_alerts(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} запросил список алертов")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -118,7 +118,7 @@ def setup_price_alert(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} настраивает ценовой алерт для {symbol}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -195,7 +195,7 @@ def setup_percent_alert(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} настраивает процентный алерт для {symbol}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -283,7 +283,7 @@ def process_price_alert(message, user_id, coin_id, user_coin_id):
     logger.info(f"👤 Пользователь @{message.from_user.username} ввел цену: {message.text}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # ✅ Валидируем цену
@@ -398,7 +398,7 @@ def process_percent_alert(message, user_id, coin_id, user_coin_id):
     logger.info(f"👤 Пользователь @{message.from_user.username} ввел процент: {message.text}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # ✅ Валидируем процент

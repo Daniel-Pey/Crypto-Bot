@@ -1,3 +1,7 @@
+"""
+📊 Модели данных для базы данных SQLite
+"""
+
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, BigInteger, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -5,6 +9,9 @@ from datetime import datetime
 
 Base = declarative_base()
 
+# ============================================================
+# 👤 МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ
+# ============================================================
 
 class User(Base):
     __tablename__ = 'users'
@@ -38,6 +45,10 @@ class User(Base):
             return False
         return datetime.utcnow() < self.subscription_end_date
 
+# ============================================================
+# 🪙 МОДЕЛИ КРИПТОВАЛЮТ
+# ============================================================
+
 class Coin(Base):
     __tablename__ = 'coins'
     
@@ -65,6 +76,10 @@ class UserCoin(Base):
     user = relationship("User", back_populates="coins")
     coin = relationship("Coin", back_populates="user_coins")
 
+# ============================================================
+# 🔔 МОДЕЛЬ АЛЕРТОВ
+# ============================================================
+
 class Alert(Base):
     __tablename__ = 'alerts'
     
@@ -79,3 +94,4 @@ class Alert(Base):
     
     # Связи
     user = relationship("User", back_populates="alerts")
+    user_coin = relationship("UserCoin")

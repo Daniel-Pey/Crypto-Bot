@@ -5,7 +5,7 @@
 
 from bot import bot
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User, Coin, UserCoin
 from utils.validators import validate_crypto_symbol
 from keyboards.inline import (
@@ -29,7 +29,7 @@ def my_coins(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} запросил список монет")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -120,7 +120,7 @@ def add_coin_prompt(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} начал добавление монеты")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -228,7 +228,7 @@ def process_add_coin(message, user_id):
         return
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Проверяем валидность символа
@@ -341,7 +341,7 @@ def coin_detail(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} запросил информацию о {symbol}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем монету
@@ -425,7 +425,7 @@ def delete_coin(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} удаляет монету {symbol}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя
@@ -499,7 +499,7 @@ def setup_alert_prompt(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} настраивает алерт для {symbol}")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Получаем пользователя

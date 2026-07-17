@@ -5,7 +5,7 @@
 
 from bot import bot
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User
 from datetime import datetime
 import telebot
@@ -24,7 +24,7 @@ def start_command(message):
     logger.info(f"👤 Пользователь @{message.from_user.username} вызвал /start")
     
     # 📊 Получаем сессию БД
-    db = get_db()
+    db = create_session()
     
     try:
         # 🔍 Проверяем, существует ли пользователь
