@@ -7,7 +7,7 @@ import threading
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from utils.logger import logger
-from database import get_db
+from database import create_session
 from models import User, Coin, UserCoin, Alert
 from services.crypto_api import CryptoPriceService
 
@@ -70,7 +70,7 @@ class PriceChecker:
     
     def _check_prices(self):
         """📊 Проверка всех цен в базе данных"""
-        db = get_db()
+        db = create_session()
         
         try:
             # 🔍 Получаем все монеты, которые отслеживаются
