@@ -383,9 +383,8 @@ def admin_info(call):
 🔄 <b>Сервисы:</b>
 • PriceChecker: Активен
 • Интервал проверки: {config.PRICE_CHECK_INTERVAL}с
-
-👑 <b>Администраторы:</b>
 """
+
     bot.edit_message_text(
         text,
         call.message.chat.id,
