@@ -8,6 +8,7 @@ from database import create_session
 from models import User
 from keyboards.inline import get_start_keyboard, get_main_menu_keyboard, get_back_keyboard
 from handlers.start import start_command
+from config import config
 
 # ============================================================
 # 🏠 КОМАНДА /MENU
@@ -173,7 +174,7 @@ def help_callback(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} запросил помощь")
     
     # 📝 Текст помощи
-    help_text = """
+    help_text = f"""
 ℹ️ <b>Помощь по боту</b>
 
 📖 <b>Основные команды:</b>
@@ -201,7 +202,7 @@ def help_callback(call):
 • Как настроить алерт? Выберите монету и нажмите "🔔 Настроить алерт"
 
 📧 <b>Поддержка:</b>
-Если у вас возникли проблемы, напишите @support_username
+Если у вас возникли проблемы, напишите {config.SUPPORT_USERNAME}
     """
     
     # 📤 Отправляем сообщение или редактируем существующее

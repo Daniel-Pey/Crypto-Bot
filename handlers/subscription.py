@@ -164,7 +164,7 @@ def subscribe(call):
 👤 <b>Пользователь:</b> @{call.from_user.username}
 
 📌 <b>Для оплаты:</b>
-1️⃣ Переведите {price} ₽ на карту: XXXX-XXXX-XXXX-XXXX
+1️⃣ Переведите {price} ₽ на карту: {config.CARD_NUMBER}
 2️⃣ После оплаты нажмите "✅ Я оплатил"
 3️⃣ Бот автоматически активирует подписку
 

@@ -9,6 +9,7 @@ class Config:
     CRYPTO_API_KEY = os.getenv('CRYPTO_API_KEY')
     ADMINS_ID = list(map(int, str(os.getenv('ADMIN_ID')).split(', ')))
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    CARD_NUMBER = os.getenv('CARD_NUMBER')
     
     # Цены на подписки
     SUBSCRIPTION_PRICES = {
