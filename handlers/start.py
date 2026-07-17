@@ -4,14 +4,15 @@
 """
 
 from bot import bot
-from utils.logger import logger
+from utils.logger import get_logger
 from database import create_session
 from models import User
 from datetime import datetime
-import telebot
-
-# 🎨 Импортируем клавиатуры
 from keyboards.inline import get_start_keyboard
+
+# 📝 Создаем логгер для этого модуля
+logger = get_logger(__name__)
+
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
@@ -21,7 +22,7 @@ def start_command(message):
     Регистрирует нового пользователя или приветствует существующего
     """
     # 📝 Логируем начало обработки
-    logger.info(f"👤 Пользователь @{message.from_user.username} вызвал /start")
+    logger.info(f"👤 Пользователь @{message.from_user.username or message.from_user.id} вызвал /start")
     
     # 📊 Получаем сессию БД
     db = create_session()
@@ -32,7 +33,8 @@ def start_command(message):
         
         if not user:
             # 🆕 Регистрируем нового пользователя
-            logger.info(f"🆕 Создаю нового пользователя: @{message.from_user.username}")
+            logger.info(f"🆕 Создаю нового пользователя: @{message.from_user.username or message.from_user.id}")
+            
             user = User(
                 telegram_id=message.from_user.id,
                 username=message.from_user.username,
@@ -42,7 +44,8 @@ def start_command(message):
             )
             db.add(user)
             db.commit()
-            logger.info(f"✅ Пользователь @{message.from_user.username} успешно зарегистрирован")
+            
+            logger.info(f"✅ Пользователь @{message.from_user.username or message.from_user.id} успешно зарегистрирован")
             
             # 🎉 Приветственное сообщение для нового пользователя
             welcome_text = f"""
@@ -70,7 +73,7 @@ def start_command(message):
             """
         else:
             # 👋 Приветствие для существующего пользователя
-            logger.info(f"👋 Возвращаюсь к пользователю @{message.from_user.username}")
+            logger.info(f"👋 Возвращаюсь к пользователю @{message.from_user.username or message.from_user.id}")
             
             # 📊 Получаем информацию о подписке
             max_coins = user.get_max_coins()
@@ -99,11 +102,11 @@ def start_command(message):
             reply_markup=get_start_keyboard()
         )
         
-        logger.info(f"✅ Приветствие отправлено пользователю @{message.from_user.username}")
+        logger.debug(f"✅ Приветствие отправлено пользователю @{message.from_user.username or message.from_user.id}")
         
     except Exception as e:
         # ❌ Обрабатываем ошибки
-        logger.error(f"💥 Ошибка в start_command для @{message.from_user.username}: {e}")
+        logger.error(f"💥 Ошибка в start_command для @{message.from_user.username or message.from_user.id}: {e}", exc_info=True)
         bot.send_message(
             message.chat.id,
             "❌ Произошла ошибка. Пожалуйста, попробуйте позже."

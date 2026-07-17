@@ -48,7 +48,7 @@ def signal_handler(sig, frame):
     
     logger.info("🧹 Закрываю соединение с базой данных...")
     logger.info("👋 Бот успешно остановлен.")
-    admin.admin_log(f"🛑 Бот остановлен {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\nПричина: {sig}")
+    admin.admin_log(f"🛑 Бот остановлен {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\nПричина: {sig} {frame}")
     sys.exit(0)
 
 if __name__ == '__main__':
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     
     try:
         # 🔄 Запускаем бесконечный поллинг
-        bot.infinity_polling(timeout=10, long_polling_timeout=5)
+        bot.polling(non_stop=True, timeout=10, long_polling_timeout=5, skip_pending=True)
         logger.info("✅ Бот готов к работе . . .")
         admin.admin_log(f'✅ Бот запущен\nВремя: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     except KeyboardInterrupt:
@@ -102,3 +102,4 @@ if __name__ == '__main__':
         if price_checker:
             price_checker.stop()
         logger.info("👋 Бот остановлен")
+        sys.exit(1)

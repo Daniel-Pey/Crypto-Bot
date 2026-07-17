@@ -2,7 +2,16 @@
 🛠️ Пакет утилит для бота
 """
 
-from .logger import logger, setup_logger, log_error
+from .logger import (
+    logger,
+    get_logger,
+    get_logger_for_file,
+    log_function_call,
+    log_error,
+    set_debug_mode,
+    print_log_summary,
+    get_log_files
+)
 from .validators import (
     validate_crypto_symbol,
     validate_price,
@@ -11,11 +20,19 @@ from .validators import (
 from .admin import admin
 
 __all__ = [
+    # Логирование
     'logger',
-    'setup_logger',
+    'get_logger',
+    'get_logger_for_file',
+    'log_function_call',
     'log_error',
+    'set_debug_mode',
+    'print_log_summary',
+    'get_log_files',
+    
+    # Валидаторы
     'validate_crypto_symbol',
     'validate_price',
-    'validate_percent',
+    'validate_percent'
     'admin'
 ]

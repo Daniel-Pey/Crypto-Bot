@@ -1,5 +1,6 @@
 from bot import bot
 from config import config
+from .logger import logger
 
 
 class Admin:
@@ -20,8 +21,12 @@ class Admin:
             message (str): сообщение (лог) для админа
         """
 
-        for id in self.admins_id:
-            bot.send_message(id, message)
+        try:
+            for id in self.admins_id:
+                bot.send_message(id, message)
+        except Exception as e:
+            error_type = type(e).__name__
+            logger.error(f"💥 Ошибка типа {error_type} при попытке отправки сообщения админу: {e}")
 
 
 admin = Admin(config.ADMINS_ID)
