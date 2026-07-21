@@ -30,7 +30,7 @@ def global_init(db_file):
     __factory = orm.sessionmaker(bind=engine)
 
     # Импорт всех моделей
-    import models
+    from . import models
 
     SqlAlchemyBase.metadata.create_all(engine)
     print("✅ База данных и таблицы созданы (если их не было)")
