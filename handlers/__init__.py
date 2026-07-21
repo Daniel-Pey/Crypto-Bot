@@ -10,3 +10,4 @@ from . import subscription
 from . import alerts
 from . import admin
 from . import payments
+from . import sales
