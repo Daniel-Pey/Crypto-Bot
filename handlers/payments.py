@@ -10,7 +10,7 @@ from database import create_session
 from database.models import User
 import datetime
 from datetime import timedelta
-from keyboards.inline import get_back_keyboard, get_confirm_payment_keyboard
+from keyboards.inline import get_back_keyboard, get_confirm_payment_keyboard, get_subscription_keyboard
 from utils.stars import convert_rub_to_stars
 
 
@@ -279,6 +279,14 @@ def confirm_payment_rub(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} подтвердил оплату {price}₽ за {coins} монет")
     
     try:
+        response, error = check_card_payment(coins, price, datetime.datetime.today())
+        if not response:
+            bot.edit_message_text(
+            error,
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=get_subscription_keyboard()
+        )
         # ✅ Активируем подписку
         text = activate_subscription(call.from_user.id, coins, price)
         
@@ -299,3 +307,15 @@ def confirm_payment_rub(call):
     except Exception as e:
         logger.error(f"💥 Ошибка в confirm_payment_rub: {e}")
         bot.answer_callback_query(call.id, f"❌ Произошла ошибка: {e}")
+
+
+def check_card_payment(coins, price, time: datetime.datetime):
+    """ Функция проверки перевода на карту
+
+    Args:
+        coins (_type_): _description_
+        price (_type_): _description_
+        time (datetime.datetime): _description_
+    """
+    
+    return False, "❌ К сожалению оплата по СПБ сейчас недостпна - выберите другой способ оплаты"
