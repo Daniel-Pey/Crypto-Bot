@@ -19,6 +19,7 @@ class Config:
     
     # Цены на подписки
     SUBSCRIPTION_PRICES = {
+        2: 4,
         5: 300,
         10: 600,
         15: 900,

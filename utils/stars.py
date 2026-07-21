@@ -18,7 +18,7 @@ def convert_rub_to_stars(rub_amount: int) -> int:
     """
     # 📝 Цена одной звезды в рублях (примерно 1.5-2 рубля)
     # 🔥 Telegram берет комиссию ~30%, поэтому нужно закладывать это
-    stars = int(rub_amount * config.ONE_STAR_PRICE)
+    stars = int(rub_amount / config.ONE_STAR_PRICE)
     
     # 🔥 Минимальное количество звезд для покупки
     if stars < 1:
