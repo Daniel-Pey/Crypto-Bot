@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from utils.logger import logger
 from database import create_session
-from models import User, Coin, UserCoin, Alert
+from database.models import User, Coin, UserCoin, Alert
 from services.crypto_api import CryptoPriceService
 
 

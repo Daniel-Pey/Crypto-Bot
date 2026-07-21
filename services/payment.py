@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Tuple
 from utils.logger import logger
 from database import create_session
-from models import User
+from database.models import User
 from config import config
 
 
