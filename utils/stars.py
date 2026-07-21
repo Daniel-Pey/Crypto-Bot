@@ -3,13 +3,26 @@
 """
 
 from config import config
+from utils import logger
 
 
-def convert_rub_to_stars(price):
-    """ Функция для превращения рублей в звезды
-
-    Args:
-        price (int | str): цена в рублях
+def convert_rub_to_stars(rub_amount: int) -> int:
     """
+    ⭐ Конвертация рублей в Telegram Stars
     
-    return int(int(price) * config.ONE_STAR_PRICE)
+    Args:
+        rub_amount: Сумма в рублях
+        
+    Returns:
+        int: Количество Stars
+    """
+    # 📝 Цена одной звезды в рублях (примерно 1.5-2 рубля)
+    # 🔥 Telegram берет комиссию ~30%, поэтому нужно закладывать это
+    stars = int(rub_amount * config.ONE_STAR_PRICE)
+    
+    # 🔥 Минимальное количество звезд для покупки
+    if stars < 1:
+        stars = 1
+    
+    logger.debug(f"💰 {rub_amount}₽ = ⭐{stars} (курс: {config.ONE_STAR_PRICE}₽/⭐)")
+    return stars
