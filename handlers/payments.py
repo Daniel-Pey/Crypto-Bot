@@ -9,6 +9,7 @@ from utils.stars import convert_rub_to_stars
 from database import create_session, User
 import datetime
 from datetime import timedelta
+from .subscription import confirm_payment_rub
 
 
 bot.callback_query_handler(func=lambda call: call.data.startswith("payment_type_stars"))
@@ -27,6 +28,13 @@ def stars_payment_handler(call):
     )
 
 
+bot.callback_query_handler(func=lambda call: call.data.startswith("payment_type_stars"))
+def card_payment_handler(call):
+    *args, coins, price = call.data.split('_')
+    call.data = f"confirm_payment_{coins}_price"
+    confirm_payment_rub(call)
+
+
 # Обработчик для подтверждения платежа перед списанием
 @bot.pre_checkout_query_handler(func=lambda query: True)
 def handle_pre_checkout_query(pre_checkout_query):
@@ -41,7 +49,7 @@ def handle_successful_payment(message):
     payment_info = message.successful_payment
     bot.send_message(
         message.chat.id,
-        f"✅ Платеж прошел успешно! Получено {payment_info.total_amount} звезд. Спасибо!"
+        f"✅ Платеж прошел успешно!\n Вы оплатили {payment_info.total_amount}⭐"
     )
 
 
