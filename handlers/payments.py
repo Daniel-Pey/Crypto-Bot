@@ -287,6 +287,7 @@ def confirm_payment_rub(call):
             call.message.message_id,
             reply_markup=get_subscription_keyboard()
         )
+            return
         # ✅ Активируем подписку
         text = activate_subscription(call.from_user.id, coins, price)
         
