@@ -15,16 +15,39 @@ class Config:
     
     # Цены на подписки
     SUBSCRIPTION_PRICES = {
-        5: 500,   # 5 монет - 500 руб/мес
-        10: 1000, # 10 монет - 1000 руб/мес
-        15: 1500, # 15 монет - 1500 руб/мес
-        20: 2000  # 20 монет - 2000 руб/мес
+        5: 300,
+        10: 600,
+        15: 900,
+        20: 1200
     }
+    
+    # Способы оплаты
+    PAYMENT_TYPES = {
+        'stars': "⭐️ STARS",
+        'card': " 💳 СБП"
+    }
+    
+    # Цена одной тг звезды в рублях (примерно)
+    ONE_STAR_PRICE = 2
     
     # Бесплатный лимит
     FREE_LIMIT = 1
     
     # Интервал проверки цен (в секундах)
     PRICE_CHECK_INTERVAL = 60
+    
+    
+    def get_prices(self):
+        """ Функция для получения цен
+
+        Returns:
+            str: цены на подписки
+        """
+        
+        prices = f"• 🎁 {self.FREE_LIMIT} монета - БЕСПЛАТНО"
+        for coins, price in self.SUBSCRIPTION_PRICES:
+            prices += f"\n• {coins} монет - {price} ₽/мес"
+        
+        return prices
 
 config = Config()

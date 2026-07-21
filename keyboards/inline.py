@@ -188,7 +188,36 @@ def get_subscription_keyboard():
     return keyboard
 
 
-def get_confirm_payment_keyboard(coins, price):
+def get_payments_keyboard(coins, price) -> InlineKeyboardMarkup:
+    """
+    💳 Клавиатура выбора способа оплаты
+    
+    Args:
+        coins (int): Количество монет в тарифе
+        price (int): Стоимость тарифа в рублях
+        
+    Returns:
+        InlineKeyboardMarkup: Клавиатура с кнопками подтверждения/отмены
+    """
+    keyboard = InlineKeyboardMarkup(row_width=len(config.PAYMENT_TYPES))
+    
+    for callback_type, title in config.PAYMENT_TYPES:
+        keyboard.add(
+            InlineKeyboardButton(
+                title,
+                callback_data=f"payment_type_{callback_type}_{coins}_{price}"
+            )
+        )
+    
+    # ❌ Кнопка отмены (возврат к тарифам)
+    keyboard.add(
+        InlineKeyboardButton("❌ Отмена", callback_data="subscription")
+    )
+        
+    return keyboard
+
+
+def get_confirm_payment_keyboard(coins, price) -> InlineKeyboardMarkup:
     """
     💳 Клавиатура подтверждения платежа
     

@@ -13,8 +13,11 @@ from keyboards.inline import (
     get_subscription_keyboard, 
     get_back_keyboard, 
     get_confirm_payment_keyboard,
-    get_confirm_keyboard
+    get_confirm_keyboard,
+    get_payments_keyboard
 )
+from .payments import confirm_payment
+
 
 @bot.callback_query_handler(func=lambda call: call.data == "subscription")
 def subscription_menu(call):
@@ -163,31 +166,16 @@ def subscribe(call):
 
 👤 <b>Пользователь:</b> @{call.from_user.username}
 
-📌 <b>Для оплаты:</b>
-1️⃣ Переведите {price} ₽ на карту: {config.CARD_NUMBER}
-2️⃣ После оплаты нажмите "✅ Я оплатил"
-3️⃣ Бот автоматически активирует подписку
-
-⚠️ <b>Внимание:</b>
-• Подписка активируется после подтверждения платежа
-• Доступ продлевается на 30 дней с момента оплаты
-• При неоплате доступ будет ограничен
-        """
-        
+Выберите способ оплаты 👇
+"""
         # 📤 Отправляем информацию о платеже
         bot.edit_message_text(
             text,
             call.message.chat.id,
             call.message.message_id,
             parse_mode='HTML',
-            reply_markup=get_confirm_payment_keyboard(coins, price)
+            reply_markup=get_payments_keyboard(coins, price)
         )
-        
-        # ✅ Отвечаем на callback
-        bot.answer_callback_query(call.id, f"💳 Тариф {coins} монет - {price} ₽")
-        
-        logger.info(f"✅ Отправлена информация о платеже для @{call.from_user.username}")
-        
     except Exception as e:
         # ❌ Обрабатываем ошибки
         logger.error(f"💥 Ошибка в subscribe для @{call.from_user.username}: {e}")
@@ -198,7 +186,7 @@ def subscribe(call):
         db.close()
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("confirm_payment_"))
-def confirm_payment(call):
+def confirm_payment_rub(call):
     """
     ✅ Подтверждение платежа
     """
@@ -211,44 +199,9 @@ def confirm_payment(call):
     coins = int(parts[2])
     price = int(parts[3]) if len(parts) > 3 else 0
     
-    # 📝 Логируем действие
-    logger.info(f"👤 Пользователь @{call.from_user.username} подтвердил оплату {price}₽ за {coins} монет")
-    
-    # 📊 Получаем сессию БД
-    db = create_session()
-    
     try:
-        # 🔍 Получаем пользователя
-        user = db.query(User).filter_by(telegram_id=call.from_user.id).first()
-        
-        if not user:
-            bot.answer_callback_query(call.id, "❌ Пользователь не найден")
-            return
-        
-        # 🔄 Обновляем подписку
-        user.subscription_type = coins
-        user.subscription_end_date = datetime.utcnow() + timedelta(days=30)
-        db.commit()
-        
         # 🎉 Успешное обновление
-        text = f"""
-✅ <b>Подписка успешно активирована!</b>
-
-🎉 Поздравляем! Ваш тариф обновлен.
-
-📊 <b>Новый тариф:</b> {coins} монет
-💰 <b>Оплачено:</b> {price} ₽
-📅 <b>Действует до:</b> {user.subscription_end_date.strftime('%d.%m.%Y')}
-
-🪙 <b>Теперь вы можете отслеживать до {coins} монет!</b>
-
-💡 <b>Советы:</b>
-• Добавьте новые монеты через меню "➕ Добавить монету"
-• Настройте алерты для важных монет
-• Следите за изменениями цен в реальном времени
-
-🚀 Удачной торговли!
-        """
+        text = confirm_payment(coins, price, call.from_user.id)
         
         bot.edit_message_text(
             text,
@@ -267,7 +220,3 @@ def confirm_payment(call):
         # ❌ Обрабатываем ошибки
         logger.error(f"💥 Ошибка в confirm_payment для @{call.from_user.username}: {e}")
         bot.answer_callback_query(call.id, "❌ Произошла ошибка")
-        db.rollback()
-    finally:
-        # 🧹 Закрываем сессию
-        db.close()
