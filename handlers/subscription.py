@@ -16,7 +16,6 @@ from keyboards.inline import (
     get_confirm_keyboard,
     get_payments_keyboard
 )
-from .payments import confirm_payment
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "subscription")
