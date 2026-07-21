@@ -185,39 +185,3 @@ def subscribe(call):
     finally:
         # 🧹 Закрываем сессию
         db.close()
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith("confirm_payment_"))
-def confirm_payment_rub(call):
-    """
-    ✅ Подтверждение платежа
-    """
-    # 📝 Извлекаем данные
-    parts = call.data.split("_")
-    if len(parts) < 3:
-        bot.answer_callback_query(call.id, "❌ Ошибка в данных")
-        return
-    
-    coins = int(parts[2])
-    price = int(parts[3]) if len(parts) > 3 else 0
-    
-    try:
-        # 🎉 Успешное обновление
-        text = confirm_payment(coins, price, call.from_user.id)
-        
-        bot.edit_message_text(
-            text,
-            call.message.chat.id,
-            call.message.message_id,
-            parse_mode='HTML',
-            reply_markup=get_back_keyboard()
-        )
-        
-        # ✅ Отвечаем на callback
-        bot.answer_callback_query(call.id, f"✅ Подписка на {coins} монет активирована")
-        
-        logger.info(f"✅ Подписка активирована для @{call.from_user.username}: {coins} монет")
-        
-    except Exception as e:
-        # ❌ Обрабатываем ошибки
-        logger.error(f"💥 Ошибка в confirm_payment для @{call.from_user.username}: {e}")
-        bot.answer_callback_query(call.id, "❌ Произошла ошибка")
