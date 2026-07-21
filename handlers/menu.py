@@ -5,7 +5,7 @@
 from bot import bot
 from utils.logger import logger
 from database import create_session
-from models import User
+from database.models import User
 from keyboards.inline import get_start_keyboard, get_main_menu_keyboard, get_back_keyboard
 from handlers.start import start_command
 from config import config

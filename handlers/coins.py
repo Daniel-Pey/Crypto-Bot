@@ -6,7 +6,7 @@
 from bot import bot
 from utils.logger import logger
 from database import create_session
-from models import User, Coin, UserCoin
+from database.models import User, Coin, UserCoin
 from utils.validators import validate_crypto_symbol
 from keyboards.inline import (
     get_coins_keyboard, 

@@ -6,7 +6,7 @@
 from bot import bot
 from utils.logger import logger
 from database import create_session
-from models import User, Coin, UserCoin, Alert
+from database.models import User, Coin, UserCoin, Alert
 from utils.validators import validate_price, validate_percent
 from keyboards.inline import get_back_keyboard, get_cancel_keyboard, get_alert_keyboard
 from handlers.menu import back_to_menu

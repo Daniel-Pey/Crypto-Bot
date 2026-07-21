@@ -11,7 +11,7 @@ from utils.admin import (
     is_admin
 )
 from database import create_session
-from models import User, Coin, Alert
+from database.models import User, Coin, Alert
 from datetime import datetime
 from keyboards.admin import (
     get_admin_keyboard, get_admin_menu_keyboard,
