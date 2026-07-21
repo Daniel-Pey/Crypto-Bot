@@ -137,6 +137,17 @@ def card_payment_handler(call):
     """
     💳 Обработка оплаты через карту/СБП
     """
+    
+    # ============================ЗАГЛУШКА========================
+    bot.edit_message_text(
+            "❌ К сожалению пока такой способ оплаты не работает - приносим свои извинения",
+            call.message.chat.id,
+            call.message.message_id,
+            parse_mode='HTML',
+            reply_markup=get_subscription_keyboard()
+        )
+    # ============================================================
+    
     # 📝 Извлекаем данные
     parts = call.data.split('_')
     if len(parts) < 4:
@@ -279,14 +290,7 @@ def confirm_payment_rub(call):
     logger.info(f"👤 Пользователь @{call.from_user.username} подтвердил оплату {price}₽ за {coins} монет")
     
     try:
-        response, error = check_card_payment(coins, price, datetime.datetime.today())
-        if not response:
-            bot.edit_message_text(
-            error,
-            call.message.chat.id,
-            call.message.message_id,
-            reply_markup=get_subscription_keyboard()
-        )
+        if not check_card_payment(coins, price, datetime.datetime.today()):
             return
         # ✅ Активируем подписку
         text = activate_subscription(call.from_user.id, coins, price)
@@ -319,4 +323,4 @@ def check_card_payment(coins, price, time: datetime.datetime):
         time (datetime.datetime): _description_
     """
     
-    return False, "❌ К сожалению оплата по СПБ сейчас недостпна - выберите другой способ оплаты"
+    return True
