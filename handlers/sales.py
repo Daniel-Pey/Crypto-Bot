@@ -4,7 +4,7 @@
 
 from bot import bot
 from utils.logger import logger
-from utils.admin import admin_required, admin_callback_required, admin_log
+from utils.admin import admin_required, admin_callback_required, admin
 from database import create_session
 from models import User, Sale
 from config import config
@@ -331,7 +331,7 @@ def sales_admin_panel(message):
             reply_markup=get_sales_admin_keyboard()
         )
         
-        admin_log(f"Админ {message.from_user.username} открыл панель акций")
+        admin.admin_log(f"Админ {message.from_user.username} открыл панель акций")
         
     except Exception as e:
         logger.error(f"💥 Ошибка в sales_admin_panel: {e}")
@@ -541,7 +541,7 @@ def process_sale_create(message):
                 reply_markup=get_sale_detail_keyboard(sale.id)
             )
             
-            admin_log(f"Создана акция {sale.id}: {sale.name} ({sale.coins} монет)")
+            admin.admin_log(f"Создана акция {sale.id}: {sale.name} ({sale.coins} монет)")
             
         except Exception as e:
             logger.error(f"💥 Ошибка сохранения акции: {e}")
@@ -669,7 +669,7 @@ def sale_toggle(call):
         # 🔄 Обновляем детали
         sale_detail(call)
         
-        admin_log(f"Акция {sale_id} {status} админом {call.from_user.username}")
+        admin.admin_log(f"Акция {sale_id} {status} админом {call.from_user.username}")
         
     except Exception as e:
         logger.error(f"💥 Ошибка в sale_toggle: {e}")
@@ -712,7 +712,7 @@ def sale_delete(call):
         
         bot.answer_callback_query(call.id, "🗑️ Акция удалена")
         
-        admin_log(f"Акция {sale_id} удалена админом {call.from_user.username}")
+        admin.admin_log(f"Акция {sale_id} удалена админом {call.from_user.username}")
         
     except Exception as e:
         logger.error(f"💥 Ошибка в sale_delete: {e}")
