@@ -146,6 +146,7 @@ def card_payment_handler(call):
             parse_mode='HTML',
             reply_markup=get_subscription_keyboard()
         )
+    return
     # ============================================================
     
     # 📝 Извлекаем данные
