@@ -201,7 +201,7 @@ def get_payments_keyboard(coins, price) -> InlineKeyboardMarkup:
     """
     keyboard = InlineKeyboardMarkup(row_width=len(config.PAYMENT_TYPES))
     
-    for callback_type, title in config.PAYMENT_TYPES:
+    for callback_type, title in config.PAYMENT_TYPES.items():
         keyboard.add(
             InlineKeyboardButton(
                 title,

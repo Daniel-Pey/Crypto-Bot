@@ -101,6 +101,7 @@ def subscribe(call):
     """
     💰 Обработка выбора тарифа
     """
+
     # 📝 Извлекаем количество монет
     coins = int(call.data.replace("subscribe_", ""))
     
