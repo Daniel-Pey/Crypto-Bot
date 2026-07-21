@@ -93,8 +93,8 @@ def stars_payment_handler(call):
         bot.answer_callback_query(call.id, "❌ Ошибка в данных")
         return
     
-    coins = int(parts[2])
-    price = int(parts[3])
+    coins = int(parts[3])
+    price = int(parts[4])
     
     # 📝 Логируем
     logger.info(f"👤 Пользователь @{call.from_user.username} выбрал оплату Stars для {coins} монет")
