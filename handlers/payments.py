@@ -7,7 +7,7 @@ from utils.logger import logger
 from telebot import types
 from config import config
 from database import create_session
-from models import User
+from database.models import User
 import datetime
 from datetime import timedelta
 from keyboards.inline import get_back_keyboard, get_confirm_payment_keyboard

@@ -3,13 +3,10 @@
 """
 
 from .db_session import create_session, global_init
-from .models import User, UserCoin, Alert, Coin
+from . import models
 
 __all__ = [
     'create_session',
     'global_init',
-    'User',
-    'UserCoin',
-    'Alert',
-    'Coin'
+    'models'
 ]

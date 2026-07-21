@@ -6,7 +6,7 @@
 from bot import bot
 from utils.logger import logger
 from database import create_session
-from models import User
+from database.models import User
 from datetime import datetime, timedelta
 from config import config
 from keyboards.inline import (

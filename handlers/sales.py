@@ -6,7 +6,7 @@ from bot import bot
 from utils.logger import logger
 from utils.admin import admin_required, admin_callback_required, admin
 from database import create_session
-from models import User, Sale
+from database.models import User, Sale
 from config import config
 from datetime import datetime, timedelta
 from keyboards.sales import (
